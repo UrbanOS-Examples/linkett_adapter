@@ -19,10 +19,9 @@ defmodule LinkettAdapter.LinkettClientTest do
       Bypass.expect(bypass, "GET", "/api/v1/activity_counter", fn conn ->
         case Plug.Conn.fetch_query_params(conn).params do
           %{"next" => _next} ->
-            Plug.Conn.resp(conn, 200, LinkettHelper.linkett_response(false) |> Jason.encode!())
-
+            resp(conn, LinkettHelper.linkett_response(false))
           _ ->
-            Plug.Conn.resp(conn, 200, LinkettHelper.linkett_response(true) |> Jason.encode!())
+            resp(conn, LinkettHelper.linkett_response(true))
         end
       end)
 
@@ -74,7 +73,7 @@ defmodule LinkettAdapter.LinkettClientTest do
       error_body = %{code: "bad_request", msg: "msg"}
 
       Bypass.expect(bypass, "GET", "/api/v1/error_counter", fn conn ->
-        Plug.Conn.resp(conn, 500, error_body)
+        resp(conn, error_body, 500)
       end)
 
       assert_raise LinkettAdapter.BadRequest, "msg", fn ->
@@ -83,15 +82,19 @@ defmodule LinkettAdapter.LinkettClientTest do
     end
 
     test "the adapter handles 401 unauthorized", %{bypass: bypass} do
-      error_body = %{code: "unauthorized", msg: "msg"} |> Jason.encode!()
+      error_body = %{code: "unauthorized", msg: "msg"}
 
       Bypass.expect(bypass, "GET", "/api/v1/no_auth", fn conn ->
-        Plug.Conn.resp(conn, 401, error_body)
+        resp(conn, error_body, 401)
       end)
 
       assert_raise LinkettAdapter.Unauthorized, fn ->
         LinkettClient.fetch("no_auth", "secret-key")
       end
     end
+  end
+
+  defp resp(conn, payload, code \\ 200) do
+    conn |> Plug.Conn.put_resp_content_type("application/json") |> Plug.Conn.resp(code, payload |> Jason.encode!())
   end
 end

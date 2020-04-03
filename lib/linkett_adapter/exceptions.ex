@@ -1,9 +1,8 @@
 defmodule LinkettAdapter.BadRequest do
   defexception message: "bad request"
 
-  def exception(message_json) do
-    msg = message_json |> Jason.decode!() |> Map.get("msg")
-    %LinkettAdapter.BadRequest{message: msg}
+  def exception(message) do
+    %LinkettAdapter.BadRequest{message: Map.get(message, "msg")}
   end
 end
 

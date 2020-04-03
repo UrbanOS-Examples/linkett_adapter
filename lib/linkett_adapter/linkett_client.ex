@@ -20,7 +20,6 @@ defmodule LinkettAdapter.LinkettClient do
 
   def get_data(type, params) do
     endpoint = Application.get_env(:linkett_adapter, :endpoint)
-    IO.inspect("#{endpoint}#{type}")
 
     with %Tesla.Env{status: 200} = response <- "#{endpoint}#{type}" |> get!(query: params) do
       response
@@ -38,9 +37,8 @@ defmodule LinkettAdapter.LinkettClient do
 
   def next_data(body, type, key) do
     case body do
-      %{"next" => paginator} ->
+      %{"next" => paginator} when not is_nil(paginator) ->
         {[body], get_data(type, [key: key, next: paginator])}
-
       _ ->
         {[body], :end}
     end
