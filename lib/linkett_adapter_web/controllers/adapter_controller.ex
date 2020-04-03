@@ -4,8 +4,7 @@ defmodule LinkettAdapterWeb.AdapterController do
   require Logger
 
   def get_data(conn, %{"type" => type}) do
-    type |> IO.inspect()
-    %{body: body} = LinkettAdapter.LinkettClient.fetch(type)
+    %{body: body} = LinkettAdapter.LinkettClient.fetch(type, 123)
     json(conn, body)
   end
 

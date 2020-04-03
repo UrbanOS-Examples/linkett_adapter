@@ -21,10 +21,9 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       conn: conn,
       bypass: bypass
     } do
-
-      Bypass.expect bypass, "GET", "/api/v1/terminals", fn conn ->
+      Bypass.expect(bypass, "GET", "/api/v1/terminals", fn conn ->
         Plug.Conn.resp(conn, 200, "{}")
-      end
+      end)
 
       conn = get(conn, "/api/v2/linkett/terminals")
       assert json_response(conn, 200) == "bob"
