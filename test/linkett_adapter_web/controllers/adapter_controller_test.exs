@@ -15,15 +15,20 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       %{bypass: bypass}
     end
 
-    test "fetches data from the given linkett resource", %{
+    test "fetches data from the given linkett resource with a provided key", %{
       conn: conn,
       bypass: bypass
     } do
+      key = "ASDAFA123"
       Bypass.expect(bypass, "GET", "/api/v1/terminals", fn conn ->
+        actual_key = Plug.Conn.fetch_query_params(conn).params |> Map.get("key")
+
+        assert actual_key = key
+
         Plug.Conn.resp(conn, 200, LinkettHelper.linkett_response(false) |> Jason.encode!())
       end)
 
-      response = get(conn, "/api/v2/linkett/terminals") |> json_response(200)
+      response = get(conn, "/api/v2/linkett/terminals?key=#{key}") |> json_response(200)
 
       assert response == [
         %{"arbitrary_field" => 1},

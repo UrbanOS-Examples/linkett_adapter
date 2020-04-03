@@ -3,13 +3,17 @@ defmodule LinkettAdapterWeb.AdapterController do
 
   require Logger
 
-  def get_data(conn, %{"type" => type}) do
+  def get_data(conn, %{"type" => type} = params) do
+    key = Map.get(params, "key")
     try do
-      data = LinkettAdapter.LinkettClient.fetch(type, 123)
+      data = LinkettAdapter.LinkettClient.fetch(type, key)
       json(conn, data)
     rescue
       LinkettAdapter.Unauthorized -> unauthorized(conn)
       error in LinkettAdapter.BadRequest -> bad_request(conn, error)
+      error ->
+        Logger.error(Exception.format(:error, error, __STACKTRACE__))
+        resp(conn, 500, "Unhandled exception: #{inspect(error)}")
     end
   end
 

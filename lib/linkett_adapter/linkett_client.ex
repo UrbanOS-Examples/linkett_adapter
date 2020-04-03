@@ -20,14 +20,15 @@ defmodule LinkettAdapter.LinkettClient do
 
   def get_data(type, params) do
     endpoint = Application.get_env(:linkett_adapter, :endpoint)
+    IO.inspect("#{endpoint}#{type}")
 
     with %Tesla.Env{status: 200} = response <- "#{endpoint}#{type}" |> get!(query: params) do
       response
         |> Map.get(:body)
-        |> Jason.decode!()
     else
       %Tesla.Env{status: 500, body: body} -> raise LinkettAdapter.BadRequest, body
       %Tesla.Env{status: 401} -> raise LinkettAdapter.Unauthorized
+      %Tesla.Env{status: 404} -> raise "Resource not found"
     end
   end
 

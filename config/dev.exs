@@ -22,14 +22,4 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :linkett_adapter,
-  secret_retriever: LinkettAdapter.SecretRetrieverLocal
-
-config :linkett_adapter,
-  linkett_credentials_key: "linkett_credentials",
-  generate_token_endpoint: "https://arc.columbus.gov/arcgis/tokens/generateToken",
-  work_orders_endpoint:
-    "https://arc.columbus.gov/arcgis/rest/services/Test/LucityWorkOrder/MapServer/1/query",
-  work_resources_endpoint:
-    "https://arc.columbus.gov/arcgis/rest/services/Test/LucityWorkOrder/MapServer/2/query",
-  work_tasks_endpoint:
-    "https://arc.columbus.gov/arcgis/rest/services/Test/LucityWorkOrder/MapServer/3/query"
+  endpoint: "https://portal3.linkett.com/api/v1/"

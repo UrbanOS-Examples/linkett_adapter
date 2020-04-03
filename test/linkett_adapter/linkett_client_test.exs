@@ -74,7 +74,7 @@ defmodule LinkettAdapter.LinkettClientTest do
       error_body = %{code: "bad_request", msg: "msg"}
 
       Bypass.expect(bypass, "GET", "/api/v1/error_counter", fn conn ->
-        Plug.Conn.resp(conn, 500, error_body |> Jason.encode!())
+        Plug.Conn.resp(conn, 500, error_body)
       end)
 
       assert_raise LinkettAdapter.BadRequest, "msg", fn ->
