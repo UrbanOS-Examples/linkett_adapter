@@ -21,10 +21,14 @@ defmodule LinkettAdapter.LinkettClient do
   def get_data(type, params) do
     endpoint = Application.get_env(:linkett_adapter, :endpoint)
 
-    "#{endpoint}#{type}"
-    |> get!(query: params)
-    |> Map.get(:body)
-    |> Jason.decode!()
+    with %Tesla.Env{status: 200} = response <- "#{endpoint}#{type}" |> get!(query: params) do
+      response
+        |> Map.get(:body)
+        |> Jason.decode!()
+    else
+      %Tesla.Env{status: 500, body: body} -> raise LinkettAdapter.BadRequest, message: body
+      %Tesla.Env{status: 401} -> raise LinkettAdapter.Unauthorized
+    end
   end
 
   def next_data(:end, _type, _key) do

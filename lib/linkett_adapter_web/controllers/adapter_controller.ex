@@ -4,8 +4,13 @@ defmodule LinkettAdapterWeb.AdapterController do
   require Logger
 
   def get_data(conn, %{"type" => type}) do
-    %{body: body} = LinkettAdapter.LinkettClient.fetch(type, 123)
-    json(conn, body)
+    try do
+      data = LinkettAdapter.LinkettClient.fetch(type, 123)
+      json(conn, data)
+    rescue
+      error in LinkettAdapter.BadRequest -> conn |> put_status(500) |> json(error)
+      LinkettAdapter.Unauthorized -> conn |> put_status(401)
+    end
   end
 
   # def work_resources(conn, %{"range_start" => range_start, "range_end" => range_end}) do

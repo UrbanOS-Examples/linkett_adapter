@@ -2,19 +2,19 @@ defmodule LinkettAdapter.LinkettClientTest do
   use ExUnit.Case
   alias LinkettAdapter.LinkettClient
 
+  setup_all do
+    bypass = Bypass.open()
+
+    Application.put_env(
+      :linkett_adapter,
+      :endpoint,
+      "http://localhost:#{bypass.port}/api/v1/"
+    )
+
+    %{bypass: bypass}
+  end
+
   describe "get /api/v1/activity_counters" do
-    setup do
-      bypass = Bypass.open()
-
-      Application.put_env(
-        :linkett_adapter,
-        :endpoint,
-        "http://localhost:#{bypass.port}/api/v1/"
-      )
-
-      %{bypass: bypass}
-    end
-
     test "test pagination for activity_counter", %{bypass: bypass} do
       Bypass.expect(bypass, "GET", "/api/v1/activity_counter", fn conn ->
         case Plug.Conn.fetch_query_params(conn).params do
@@ -43,6 +43,26 @@ defmodule LinkettAdapter.LinkettClientTest do
         %{"arbitrary_field" => 2},
         %{"arbitrary_field" => 3}
       ]
+    end
+  end
+
+  describe "errors from linkett flow through the adapter" do
+    test "the adapter handles 500 internal server error", %{bypass: bypass} do
+      error_body = %{code: "bad_request", msg: "msg"} |> Jason.encode!()
+      Bypass.expect(bypass, "GET", "/api/v1/error_counter", fn conn ->
+        Plug.Conn.resp(conn, 500, error_body)
+      end)
+
+      assert_raise LinkettAdapter.BadRequest, error_body, fn -> LinkettClient.fetch("error_counter", "secret-key") end
+    end
+
+    test "the adapter handles 401 unauthorized", %{bypass: bypass} do
+      error_body = %{code: "unauthorized", msg: "msg"} |> Jason.encode!()
+      Bypass.expect(bypass, "GET", "/api/v1/no_auth", fn conn ->
+        Plug.Conn.resp(conn, 401, error_body)
+      end)
+
+      assert_raise LinkettAdapter.Unauthorized, fn -> LinkettClient.fetch("no_auth", "secret-key") end
     end
   end
 
