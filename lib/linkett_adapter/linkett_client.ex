@@ -26,7 +26,7 @@ defmodule LinkettAdapter.LinkettClient do
         |> Map.get(:body)
         |> Jason.decode!()
     else
-      %Tesla.Env{status: 500, body: body} -> raise LinkettAdapter.BadRequest, message: body
+      %Tesla.Env{status: 500, body: body} -> raise LinkettAdapter.BadRequest, body
       %Tesla.Env{status: 401} -> raise LinkettAdapter.Unauthorized
     end
   end
