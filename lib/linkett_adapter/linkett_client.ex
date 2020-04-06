@@ -4,24 +4,24 @@ defmodule LinkettAdapter.LinkettClient do
 
   plug Tesla.Middleware.JSON
 
-  def fetch(type, key) do
+  def fetch(resource, key) do
     Stream.resource(
-      fn -> get_data(type, [key: key]) end,
+      fn -> get_data(resource, [key: key]) end,
       fn body ->
-        next_data(body, type, key)
+        next_data(body, resource, key)
       end,
       fn _ ->
-        Logger.debug("Finished pagination for #{type}")
+        Logger.debug("Finished pagination for #{resource}")
       end
     )
     |> Stream.flat_map(&row_col_to_map/1)
     |> Enum.to_list()
   end
 
-  def get_data(type, params) do
+  def get_data(resource, params) do
     endpoint = Application.get_env(:linkett_adapter, :endpoint)
 
-    with %Tesla.Env{status: 200} = response <- "#{endpoint}#{type}" |> get!(query: params) do
+    with %Tesla.Env{status: 200} = response <- "#{endpoint}#{resource}" |> get!(query: params) do
       response
         |> Map.get(:body)
     else
@@ -31,14 +31,14 @@ defmodule LinkettAdapter.LinkettClient do
     end
   end
 
-  def next_data(:end, _type, _key) do
+  def next_data(:end, _resource, _key) do
     {:halt, :end}
   end
 
-  def next_data(body, type, key) do
+  def next_data(body, resource, key) do
     case body do
       %{"next" => paginator} when not is_nil(paginator) ->
-        {[body], get_data(type, [key: key, next: paginator])}
+        {[body], get_data(resource, [key: key, next: paginator])}
       _ ->
         {[body], :end}
     end

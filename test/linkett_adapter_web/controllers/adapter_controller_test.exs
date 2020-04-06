@@ -25,7 +25,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
 
         assert actual_key = key
 
-        Plug.Conn.resp(conn, 200, LinkettHelper.linkett_response(false) |> Jason.encode!())
+        LinkettHelper.resp(conn, LinkettHelper.linkett_response(false), 200)
       end)
 
       response = get(conn, "/api/v2/linkett/terminals?key=#{key}") |> json_response(200)
@@ -42,8 +42,8 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       bypass: bypass
     } do
       Bypass.expect(bypass, "GET", "/api/v1/terminal_error", fn conn ->
-        error_body = %{code: "bad_request", msg: "msg"} |> Jason.encode!()
-        Plug.Conn.resp(conn, 500, error_body)
+        error_body = %{code: "bad_request", msg: "msg"}
+        LinkettHelper.resp(conn, error_body, 500)
       end)
 
       get(conn, "/api/v2/linkett/terminal_error") |> json_response(400)
@@ -54,8 +54,8 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       bypass: bypass
     } do
       Bypass.expect(bypass, "GET", "/api/v1/no_auth", fn conn ->
-        error_body = %{code: "unauthorized", msg: "msg"} |> Jason.encode!()
-        Plug.Conn.resp(conn, 401, error_body)
+        error_body = %{code: "unauthorized", msg: "msg"}
+        LinkettHelper.resp(conn, error_body, 401)
       end)
 
       get(conn, "/api/v2/linkett/no_auth") |> json_response(401)

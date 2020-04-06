@@ -3,10 +3,10 @@ defmodule LinkettAdapterWeb.AdapterController do
 
   require Logger
 
-  def get_data(conn, %{"type" => type} = params) do
+  def get_data(conn, %{"resource" => resource} = params) do
     key = Map.get(params, "key")
     try do
-      data = LinkettAdapter.LinkettClient.fetch(type, key)
+      data = LinkettAdapter.LinkettClient.fetch(resource, key)
       json(conn, data)
     rescue
       LinkettAdapter.Unauthorized -> unauthorized(conn)

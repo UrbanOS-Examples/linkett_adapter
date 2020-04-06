@@ -13,6 +13,6 @@ defmodule LinkettAdapterWeb.Router do
   scope "/api/v2/linkett", LinkettAdapterWeb do
     pipe_through :api
 
-    get "/:type", AdapterController, :get_data
+    get "/:resource", AdapterController, :get_data
   end
 end

@@ -25,4 +25,8 @@ defmodule LinkettHelper do
       data
     end
   end
+
+  def resp(conn, payload, code \\ 200) do
+    conn |> Plug.Conn.put_resp_content_type("application/json") |> Plug.Conn.resp(code, payload |> Jason.encode!())
+  end
 end
