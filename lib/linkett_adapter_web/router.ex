@@ -6,11 +6,11 @@ defmodule LinkettAdapterWeb.Router do
     plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
   end
 
-  scope "/api/v2", LinkettAdapterWeb do
+  scope "/api/v1", LinkettAdapterWeb do
     get "/healthcheck", HealthCheckController, :index
   end
 
-  scope "/api/v2/linkett", LinkettAdapterWeb do
+  scope "/api/v1/linkett", LinkettAdapterWeb do
     pipe_through :api
 
     get "/:resource", AdapterController, :get_data

@@ -28,7 +28,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
         LinkettHelper.resp(conn, LinkettHelper.linkett_response(false), 200)
       end)
 
-      response = get(conn, "/api/v2/linkett/terminals?key=#{key}") |> json_response(200)
+      response = get(conn, "/api/v1/linkett/terminals?key=#{key}") |> json_response(200)
 
       assert response == [
         %{"arbitrary_field" => 1},
@@ -46,7 +46,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
         LinkettHelper.resp(conn, error_body, 500)
       end)
 
-      get(conn, "/api/v2/linkett/terminal_error") |> json_response(400)
+      get(conn, "/api/v1/linkett/terminal_error") |> json_response(400)
     end
 
     test "returns 401 on unauthorized response from linkett", %{
@@ -58,7 +58,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
         LinkettHelper.resp(conn, error_body, 401)
       end)
 
-      get(conn, "/api/v2/linkett/no_auth") |> json_response(401)
+      get(conn, "/api/v1/linkett/no_auth") |> json_response(401)
     end
   end
 end
