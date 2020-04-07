@@ -4,11 +4,11 @@ defmodule LinkettAdapter.LinkettClient do
 
   plug Tesla.Middleware.JSON
 
-  def fetch(resource, key) do
+  def fetch(resource, params) do
     Stream.resource(
-      fn -> get_data(resource, [key: key]) end,
+      fn -> get_data(resource, params) end,
       fn body ->
-        next_data(body, resource, key)
+        next_data(body, resource, params)
       end,
       fn _ ->
         Logger.debug("Finished pagination for #{resource}")
@@ -35,10 +35,10 @@ defmodule LinkettAdapter.LinkettClient do
     {:halt, :end}
   end
 
-  def next_data(body, resource, key) do
+  def next_data(body, resource, params) do
     case body do
       %{"next" => paginator} when not is_nil(paginator) ->
-        {[body], get_data(resource, [key: key, next: paginator])}
+        {[body], get_data(resource, Map.put(params, :next, paginator))}
       _ ->
         {[body], :end}
     end

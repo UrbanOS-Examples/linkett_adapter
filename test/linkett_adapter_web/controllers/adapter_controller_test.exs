@@ -15,20 +15,25 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       %{bypass: bypass}
     end
 
-    test "fetches data from the given linkett resource with a provided key", %{
+    test "fetches data from the given linkett resource with all provided params except the path param", %{
       conn: conn,
       bypass: bypass
     } do
       key = "ASDAFA123"
+      other_thing = "bob"
+      a_param = "bob"
       Bypass.expect(bypass, "GET", "/api/v1/terminals", fn conn ->
-        actual_key = Plug.Conn.fetch_query_params(conn).params |> Map.get("key")
+        params = Plug.Conn.fetch_query_params(conn).params
 
-        assert actual_key = key
+        assert Map.get(params, "key") == key
+        assert Map.get(params, "other_thing") == other_thing
+        assert Map.get(params, "a_param") == a_param
+        assert Map.get(params, "resource") == nil
 
         LinkettHelper.resp(conn, LinkettHelper.linkett_response(false), 200)
       end)
 
-      response = get(conn, "/api/v1/linkett/terminals?key=#{key}") |> json_response(200)
+      response = get(conn, "/api/v1/linkett/terminals", %{"key" => key, "other_thing" => other_thing, "a_param" => a_param}) |> json_response(200)
 
       assert response == [
         %{"arbitrary_field" => 1},
