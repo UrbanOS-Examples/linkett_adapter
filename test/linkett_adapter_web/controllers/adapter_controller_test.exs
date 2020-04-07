@@ -15,7 +15,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
       %{bypass: bypass}
     end
 
-    test "fetches data from the given linkett resource with all provided params", %{
+    test "fetches data from the given linkett resource with all provided params except the path param", %{
       conn: conn,
       bypass: bypass
     } do
@@ -28,6 +28,7 @@ defmodule LinkettAdapterWeb.WorkOrdersControllerTest do
         assert Map.get(params, "key") == key
         assert Map.get(params, "other_thing") == other_thing
         assert Map.get(params, "a_param") == a_param
+        assert Map.get(params, "resource") == nil
 
         LinkettHelper.resp(conn, LinkettHelper.linkett_response(false), 200)
       end)
