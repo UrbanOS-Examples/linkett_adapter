@@ -25,7 +25,7 @@ defmodule LinkettAdapter.LinkettClientTest do
         end
       end)
 
-      results = LinkettClient.fetch("activity_counter", "secret-key")
+      results = LinkettClient.fetch("activity_counter", %{key: "secret-key"})
 
       assert Enum.count(results) == 6
     end
@@ -77,7 +77,7 @@ defmodule LinkettAdapter.LinkettClientTest do
       end)
 
       assert_raise LinkettAdapter.BadRequest, "msg", fn ->
-        LinkettClient.fetch("error_counter", "secret-key")
+        LinkettClient.fetch("error_counter", %{key: "secret-key"})
       end
     end
 
@@ -89,7 +89,7 @@ defmodule LinkettAdapter.LinkettClientTest do
       end)
 
       assert_raise LinkettAdapter.Unauthorized, fn ->
-        LinkettClient.fetch("no_auth", "secret-key")
+        LinkettClient.fetch("no_auth", %{key: "secret-key"})
       end
     end
   end
