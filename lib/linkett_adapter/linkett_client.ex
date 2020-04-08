@@ -3,6 +3,15 @@ defmodule LinkettAdapter.LinkettClient do
   require Logger
 
   plug Tesla.Middleware.JSON
+  plug Tesla.Middleware.Retry,
+    delay: 1000,
+    max_retries: 5,
+    max_delay: 5_000,
+    should_retry: fn
+      {:ok, %{status: 503}} -> true
+      {:ok, _} -> false
+      {:error, _} -> false
+    end
 
   def fetch(resource, params) do
     Stream.resource(
